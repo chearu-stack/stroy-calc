@@ -47,7 +47,7 @@
         const staticHead = height;
         const pressureHead = pressure * 10.2;
         const totalHead = staticHead + pipeLoss + pressureHead;
-        const power = totalHead * flow * 0.163 / 60; // гидравлическая мощность в кВт
+        const power = totalHead * flow / 6120; // гидравлическая (полезная) мощность в кВт, Q в л/мин
 
         let out = `Расход: ${flow} л/мин\n`;
         out += `Диаметр трубы: ${input.diameter} мм\n`;
