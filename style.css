@@ -1,0 +1,171 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: #f0f2f5;
+    color: #1a1a1a;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+.container {
+    max-width: 560px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 32px 28px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+h1 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    letter-spacing: -0.3px;
+}
+
+.subtitle {
+    color: #6b7280;
+    margin-bottom: 28px;
+    font-size: 14px;
+}
+
+.block {
+    margin-bottom: 18px;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #374151;
+}
+
+select,
+input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+    background: #fafafa;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    font-family: inherit;
+}
+
+select:focus,
+input:focus {
+    border-color: #2563eb;
+    background: #ffffff;
+}
+
+button {
+    width: 100%;
+    padding: 13px;
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s;
+    font-family: inherit;
+}
+
+button:hover {
+    background: #1d4ed8;
+}
+
+#result {
+    margin-top: 24px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border-left: 4px solid #2563eb;
+    white-space: pre-line;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+/* ─── Блок экспорта ─── */
+
+#export-block {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.export-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 10px;
+}
+
+.export-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.export-btn {
+    flex: 1;
+    padding: 10px 0;
+    background: #ffffff;
+    color: #2563eb;
+    border: 1px solid #2563eb;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 0;
+    transition: background 0.2s, color 0.2s;
+}
+
+.export-btn:hover {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ─── Печать ─── */
+
+@media print {
+    body {
+        background: #ffffff;
+        padding: 0;
+    }
+
+    .container {
+        box-shadow: none;
+        border-radius: 0;
+        padding: 20px;
+        max-width: 100%;
+    }
+
+    #export-block,
+    #calculate,
+    #section,
+    #subsection,
+    #calculator,
+    #fields {
+        display: none !important;
+    }
+
+    #result {
+        display: block !important;
+        border-left: none;
+        padding: 0;
+        background: #ffffff;
+    }
+}

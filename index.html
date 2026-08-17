@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stroy-Calc — строительные калькуляторы</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Stroy-Calc</h1>
+        <p class="subtitle">Инженерные расчёты для строительства и ремонта</p>
+
+        <div class="block">
+            <label for="section">Раздел</label>
+            <select id="section">
+                <option value="">— Выберите раздел —</option>
+            </select>
+        </div>
+
+        <div class="block hidden" id="subsection-block">
+            <label for="subsection">Подраздел</label>
+            <select id="subsection">
+                <option value="">— Выберите подраздел —</option>
+            </select>
+        </div>
+
+        <div class="block hidden" id="calculator-block">
+            <label for="calculator">Калькулятор</label>
+            <select id="calculator">
+                <option value="">— Выберите калькулятор —</option>
+            </select>
+        </div>
+
+        <div id="fields" class="hidden"></div>
+
+        <button id="calculate" class="hidden">Рассчитать</button>
+
+        <div id="result" class="hidden"></div>
+
+        <div id="export-block" class="hidden">
+            <div class="export-title">Экспорт результата</div>
+            <div class="export-buttons">
+                <button id="copy-result" class="export-btn">Скопировать</button>
+                <button id="download-txt" class="export-btn">Скачать TXT</button>
+                <button id="print-result" class="export-btn">Печать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Данные -->
+    <script src="data/regions.js"></script>
+    <script src="data/soils.js"></script>
+    <script src="data/wall-materials.js"></script>
+    <script src="data/taxonomy.js"></script>
+
+    <!-- Реестр -->
+    <script src="registry.js"></script>
+
+    <!-- Геология -->
+    <script src="sections/geology/foundation-depth.js"></script>
+    <script src="sections/geology/foundation-type.js"></script>
+    <script src="sections/geology/foundation-load.js"></script>
+    <script src="sections/geology/drainage.js"></script>
+
+    <!-- Коробка (стены) -->
+    <script src="sections/walls/single-layer.js"></script>
+    <script src="sections/walls/insulation-thickness.js"></script>
+    <script src="sections/walls/r-value.js"></script>
+    <script src="sections/walls/bearing.js"></script>
+    <script src="sections/walls/economy.js"></script>
+
+    <!-- Движок -->
+    <script src="engine.js"></script>
+</body>
+</html>
