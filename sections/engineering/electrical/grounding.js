@@ -23,8 +23,8 @@
         else if (input.soil === "Торф / органика") resistivity = 25;
         else resistivity = 150;
 
-        const singleResistance = resistivity / length;
-        const utilization = electrodes === 1 ? 1 : electrodes === 2 ? 0.85 : electrodes === 3 ? 0.75 : 0.65;
+        const singleResistance = 0.3 * resistivity / length;
+        const utilization = electrodes === 1 ? 1 : electrodes === 2 ? 0.85 : electrodes === 3 ? 0.75 : electrodes === 5 ? 0.65 : 0.55;
         const totalResistance = singleResistance / (electrodes * utilization);
 
         let out = `Тип грунта: ${input.soil}\n`;
@@ -38,8 +38,10 @@
         if (totalResistance <= 4) {
             out += `Статус: ПРИНЯТО`;
         } else {
+            const needed = Math.ceil(singleResistance / (4 * utilization));
             out += `Статус: НЕДОСТАТОЧНО\n`;
-            out += `Требуется увеличить количество электродов или их длину.`;
+            out += `Требуется электродов: ${needed} шт (при длине ${length} м)\n`;
+            out += `Или увеличить длину электродов.`;
         }
 
         out += `\n\nРасчёт выполнен по нормативным формулам для типовых условий.`;
