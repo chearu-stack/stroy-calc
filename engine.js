@@ -535,4 +535,79 @@ printBtn.addEventListener("click", function() {
     window.print();
 });
 
+// ============================================
+// ПЕРЕНОС ИЗБРАННОГО МЕЖДУ УСТРОЙСТВАМИ
+// Файл с расширением .stroycalc — по факту обычный JSON, но необычное
+// расширение отбивает случайное желание залезть внутрь через блокнот.
+// ============================================
+
+const FAVORITES_FILE_TYPE = "stroy-calc-favorites";
+
+const downloadFavoritesBtn = document.getElementById("download-favorites");
+const uploadFavoritesBtn = document.getElementById("upload-favorites");
+const favoritesFileInput = document.getElementById("favorites-file-input");
+
+downloadFavoritesBtn.addEventListener("click", function() {
+    const favorites = getFavorites();
+
+    if (favorites.length === 0) {
+        alert("Список избранного пуст — нечего скачивать.");
+        return;
+    }
+
+    const payload = {
+        type: FAVORITES_FILE_TYPE,
+        version: 1,
+        favorites: favorites
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/octet-stream" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `stroy-calc-favorites_${Date.now()}.stroycalc`;
+    a.click();
+    URL.revokeObjectURL(url);
+});
+
+uploadFavoritesBtn.addEventListener("click", function() {
+    favoritesFileInput.click();
+});
+
+favoritesFileInput.addEventListener("change", function() {
+    const file = this.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        let data;
+        try {
+            data = JSON.parse(e.target.result);
+        } catch (err) {
+            alert("Файл повреждён или имеет неверный формат.");
+            favoritesFileInput.value = "";
+            return;
+        }
+
+        if (!data || data.type !== FAVORITES_FILE_TYPE || !Array.isArray(data.favorites)) {
+            alert("Это не файл избранного stroy-calc.");
+            favoritesFileInput.value = "";
+            return;
+        }
+
+        // Слияние, не замена — избранное с этого устройства не теряется
+        const current = getFavorites();
+        const merged = [...new Set([...current, ...data.favorites])];
+        saveFavorites(merged);
+
+        favoritesFileInput.value = "";
+
+        alert(`Добавлено в избранное: ${data.favorites.length}. Страница сейчас обновится.`);
+        window.location.reload();
+    };
+
+    reader.readAsText(file);
+});
+
 init();

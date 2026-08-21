@@ -11,6 +11,15 @@
         <h1>Stroy-Calc</h1>
         <p class="subtitle">Инженерные расчёты для строительства и ремонта</p>
 
+        <div class="block" id="favorites-config-block">
+            <div class="export-title">Избранное на другом устройстве</div>
+            <div class="export-buttons">
+                <button id="download-favorites" class="export-btn">⭐ Скачать избранное</button>
+                <button id="upload-favorites" class="export-btn">📥 Загрузить избранное</button>
+            </div>
+            <input type="file" id="favorites-file-input" accept=".stroycalc" style="display:none">
+        </div>
+
         <div class="block">
             <label for="section">Раздел</label>
             <select id="section">
