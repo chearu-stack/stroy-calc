@@ -121,20 +121,45 @@ function fillFavoriteCalculators() {
     calculatorBlock.classList.remove("hidden");
 }
 
-function fillCalculators(section, subsection) {
+function buildCalculatorOptions(list) {
     calculatorSelect.innerHTML = '<option value="">— Выберите калькулятор —</option>';
+
+    const favorites = list.filter(calc => isFavorite(calc.id));
+    const rest = list.filter(calc => !isFavorite(calc.id));
+
+    favorites.forEach(calc => {
+        const option = document.createElement("option");
+        option.value = calc.id;
+        option.textContent = `★ ${calc.name}`;
+        calculatorSelect.appendChild(option);
+    });
+
+    if (favorites.length > 0 && rest.length > 0) {
+        const separator = document.createElement("option");
+        separator.disabled = true;
+        separator.textContent = "──────────";
+        calculatorSelect.appendChild(separator);
+    }
+
+    rest.forEach(calc => {
+        const option = document.createElement("option");
+        option.value = calc.id;
+        option.textContent = calc.name;
+        calculatorSelect.appendChild(option);
+    });
+}
+
+function fillCalculators(section, subsection) {
     resetFields();
 
     const list = window.CalculatorRegistry.getAll()
         .filter(c => c.section === section && c.subsection === subsection)
         .sort((a, b) => a.name.localeCompare(b.name, "ru"));
 
-    list.forEach(calc => {
-        const option = document.createElement("option");
-        option.value = calc.id;
-        option.textContent = calc.name;
-        calculatorSelect.appendChild(option);
-    });
+    // Внутри раздела избранные калькуляторы (из ЭТОГО раздела) поднимаются
+    // наверх с пометкой ★ — чтобы прораб/контролёр, зайдя в раздел с 15-25
+    // калькуляторами, сразу видел свои 2-3 нужных, не листая весь список.
+    buildCalculatorOptions(list);
 
     calculatorBlock.classList.remove("hidden");
 }
@@ -362,13 +387,32 @@ function renderFavoriteButton() {
 
         btn.addEventListener("click", function() {
             if (!currentCalculator) return;
-            toggleFavorite(currentCalculator.id);
+            const calcId = currentCalculator.id;
+            toggleFavorite(calcId);
             updateFavoriteButtonLabel();
 
-            // Если сняли звёздочку, находясь внутри раздела «Избранное» —
-            // сразу убираем калькулятор из списка, не дожидаясь перезагрузки
-            if (sectionSelect.value === FAVORITES_SECTION && !isFavorite(currentCalculator.id)) {
-                fillFavoriteCalculators();
+            // Перестраиваем ТОЛЬКО список опций (не поля формы!), чтобы
+            // пометка ★ обновилась сразу, а уже введённые пользователем
+            // значения в форме не потерялись.
+            if (sectionSelect.value === FAVORITES_SECTION) {
+                if (!isFavorite(calcId)) {
+                    // Калькулятор исчез из избранного — здесь его больше
+                    // не должно быть в списке, поля сбрасываем осознанно
+                    fillFavoriteCalculators();
+                } else {
+                    const list = getFavorites()
+                        .map(id => window.CalculatorRegistry.getById(id))
+                        .filter(c => c !== undefined)
+                        .sort((a, b) => a.name.localeCompare(b.name, "ru"));
+                    buildCalculatorOptions(list);
+                    calculatorSelect.value = calcId;
+                }
+            } else {
+                const list = window.CalculatorRegistry.getAll()
+                    .filter(c => c.section === sectionSelect.value && c.subsection === (subsectionSelect.value || null))
+                    .sort((a, b) => a.name.localeCompare(b.name, "ru"));
+                buildCalculatorOptions(list);
+                calculatorSelect.value = calcId;
             }
         });
     }
