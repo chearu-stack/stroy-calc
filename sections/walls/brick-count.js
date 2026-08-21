@@ -43,6 +43,27 @@ window.CalculatorRegistry.register({
             options: ["Кирпич", "Блок (газоблок, ракушечник, известняк и др.)"]
         },
         {
+            id: "brickLength",
+            label: "Длина кирпича (мм)",
+            type: "number",
+            step: 1,
+            visibleWhen: { field: "masonryMaterial", equals: "Кирпич" }
+        },
+        {
+            id: "brickHeight",
+            label: "Высота кирпича (мм) — например, 65 / 70 / 88 / 90",
+            type: "number",
+            step: 1,
+            visibleWhen: { field: "masonryMaterial", equals: "Кирпич" }
+        },
+        {
+            id: "brickSeam",
+            label: "Толщина шва (мм), обычно 10-12",
+            type: "number",
+            step: 1,
+            visibleWhen: { field: "masonryMaterial", equals: "Кирпич" }
+        },
+        {
             id: "brickThickness",
             label: "Толщина кладки в кирпичах (0.5 / 1 / 1.5 / 2 / 2.5)",
             type: "number",
@@ -125,17 +146,29 @@ window.CalculatorRegistry.register({
         out += `Материал: ${input.masonryMaterial}\n\n`;
 
         if (input.masonryMaterial === "Кирпич") {
+            const brickLength = parseFloat(input.brickLength);
+            const brickHeight = parseFloat(input.brickHeight);
+            const seam = parseFloat(input.brickSeam);
             const thickness = parseFloat(input.brickThickness);
+
+            if (isNaN(brickLength) || brickLength <= 0) return "Укажите длину кирпича.";
+            if (isNaN(brickHeight) || brickHeight <= 0) return "Укажите высоту кирпича.";
+            if (isNaN(seam) || seam < 0) return "Укажите толщину шва (0, если впритык).";
             if (isNaN(thickness) || thickness <= 0) return "Укажите толщину кладки в кирпичах.";
 
-            // База: 51 шт/м² на каждые 0.5 кирпича толщины (справочное значение,
-            // учитывает шов 10 мм). Расход растёт линейно с толщиной —
-            // упрощение, не учитывающее экономию на перевязке (в пределах пары %).
-            const baseRatePerHalfBrick = 51;
+            // База: сколько кирпичей нужно на 1 м² фасада при укладке в один
+            // слой (толщина 0.5) — считается из реальной лицевой грани кирпича
+            // (длина × высота) с учётом шва. Дальше расход растёт линейно
+            // с толщиной кладки — упрощение, не учитывающее экономию на
+            // перевязке (в пределах пары %).
+            const lengthM = (brickLength + seam) / 1000;
+            const heightM = (brickHeight + seam) / 1000;
+            const baseRatePerHalfBrick = 1 / (lengthM * heightM);
             const rate = baseRatePerHalfBrick * (thickness / 0.5);
             const totalUnits = Math.ceil(netArea * rate * margin);
 
-            out += `Толщина кладки: ${thickness} кирпича (~${Math.round(thickness * 250)} мм)\n`;
+            out += `Размер кирпича: ${brickLength} × ${brickHeight} мм, шов ${seam} мм\n`;
+            out += `Толщина кладки: ${thickness} кирпича (~${Math.round(thickness * brickLength)} мм)\n`;
             out += `Расход: ${rate.toFixed(1)} шт/м²\n\n`;
             out += `ИТОГО (с запасом 5%): ${totalUnits} кирпичей\n\n`;
 
