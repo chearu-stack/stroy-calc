@@ -138,6 +138,35 @@ button:hover {
     display: none;
 }
 
+/* ─── Генерируемые группы полей (окна, двери и т.п.) ─── */
+
+.generated-container {
+    margin-top: -6px;
+}
+
+.generated-item {
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border-left: 3px solid #2563eb;
+}
+
+.generated-item-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2563eb;
+    margin-bottom: 10px;
+}
+
+.generated-item .block {
+    margin-bottom: 10px;
+}
+
+.generated-item .block:last-child {
+    margin-bottom: 0;
+}
+
 /* ─── Печать ─── */
 
 @media print {
