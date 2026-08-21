@@ -167,6 +167,34 @@ button:hover {
     margin-bottom: 0;
 }
 
+/* ─── Кнопка избранного ─── */
+
+.favorite-btn {
+    width: 100%;
+    padding: 11px;
+    background: #ffffff;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    font-family: inherit;
+}
+
+.favorite-btn:hover {
+    border-color: #f59e0b;
+    color: #f59e0b;
+}
+
+.favorite-btn-active {
+    background: #fffbeb;
+    color: #f59e0b;
+    border-color: #f59e0b;
+}
+
 /* ─── Печать ─── */
 
 @media print {

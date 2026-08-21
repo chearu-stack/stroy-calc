@@ -23,10 +23,57 @@ let lastInput = null;
 let lastResult = null;
 let lastFieldEntries = null; // [{label, value}] в порядке отображения — для экспорта
 
+// ---------- ИЗБРАННОЕ ----------
+// Хранится в localStorage браузера, как список id калькуляторов.
+// Ни один калькулятор ничего не знает про эту механику — это чисто
+// фронтенд-слой поверх уже существующего реестра.
+
+const FAVORITES_KEY = "stroy-calc-favorites";
+const FAVORITES_SECTION = "⭐ Избранное";
+
+function getFavorites() {
+    try {
+        const raw = localStorage.getItem(FAVORITES_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveFavorites(ids) {
+    try {
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify(ids));
+    } catch (e) {
+        // localStorage недоступен (приватный режим и т.п.) — просто не сохраняем
+    }
+}
+
+function isFavorite(id) {
+    return getFavorites().includes(id);
+}
+
+function toggleFavorite(id) {
+    const favorites = getFavorites();
+    const index = favorites.indexOf(id);
+    if (index === -1) {
+        favorites.push(id);
+    } else {
+        favorites.splice(index, 1);
+    }
+    saveFavorites(favorites);
+}
+
 function init() {
     const sections = [...new Set(
         window.CalculatorRegistry.getAll().map(c => c.section)
     )].sort((a, b) => a.localeCompare(b, "ru"));
+
+    if (getFavorites().length > 0) {
+        const favOption = document.createElement("option");
+        favOption.value = FAVORITES_SECTION;
+        favOption.textContent = FAVORITES_SECTION;
+        sectionSelect.appendChild(favOption);
+    }
 
     sections.forEach(section => {
         const option = document.createElement("option");
@@ -46,6 +93,32 @@ function resetFields() {
     lastInput = null;
     lastResult = null;
     lastFieldEntries = null;
+
+    const favBtn = document.getElementById("favorite-btn");
+    if (favBtn) favBtn.classList.add("hidden");
+}
+
+function fillFavoriteCalculators() {
+    calculatorSelect.innerHTML = '<option value="">— Выберите калькулятор —</option>';
+    resetFields();
+
+    const favoriteIds = getFavorites();
+    const list = favoriteIds
+        .map(id => window.CalculatorRegistry.getById(id))
+        .filter(calc => calc !== undefined) // на случай, если калькулятор был удалён из реестра
+        .sort((a, b) => a.name.localeCompare(b.name, "ru"));
+
+    list.forEach(calc => {
+        const option = document.createElement("option");
+        option.value = calc.id;
+        // Показываем раздел в скобках — в "Избранном" калькуляторы вперемешку из разных разделов
+        option.textContent = calc.subsection
+            ? `${calc.name} (${calc.section} → ${calc.subsection})`
+            : `${calc.name} (${calc.section})`;
+        calculatorSelect.appendChild(option);
+    });
+
+    calculatorBlock.classList.remove("hidden");
 }
 
 function fillCalculators(section, subsection) {
@@ -72,6 +145,12 @@ sectionSelect.addEventListener("change", function() {
     subsectionSelect.innerHTML = '<option value="">— Выберите подраздел —</option>';
     calculatorSelect.innerHTML = '<option value="">— Выберите калькулятор —</option>';
     resetFields();
+
+    if (section === FAVORITES_SECTION) {
+        subsectionBlock.classList.add("hidden");
+        fillFavoriteCalculators();
+        return;
+    }
 
     const subsections = [...new Set(
         window.CalculatorRegistry.getAll()
@@ -266,7 +345,46 @@ calculatorSelect.addEventListener("change", function() {
 
     currentCalculator = calc;
     renderFields();
+    renderFavoriteButton();
 });
+
+// ---------- КНОПКА ИЗБРАННОГО ----------
+
+function renderFavoriteButton() {
+    let btn = document.getElementById("favorite-btn");
+
+    if (!btn) {
+        btn = document.createElement("button");
+        btn.id = "favorite-btn";
+        btn.type = "button";
+        btn.className = "favorite-btn";
+        calculateBtn.insertAdjacentElement("afterend", btn);
+
+        btn.addEventListener("click", function() {
+            if (!currentCalculator) return;
+            toggleFavorite(currentCalculator.id);
+            updateFavoriteButtonLabel();
+
+            // Если сняли звёздочку, находясь внутри раздела «Избранное» —
+            // сразу убираем калькулятор из списка, не дожидаясь перезагрузки
+            if (sectionSelect.value === FAVORITES_SECTION && !isFavorite(currentCalculator.id)) {
+                fillFavoriteCalculators();
+            }
+        });
+    }
+
+    btn.classList.remove("hidden");
+    updateFavoriteButtonLabel();
+}
+
+function updateFavoriteButtonLabel() {
+    const btn = document.getElementById("favorite-btn");
+    if (!btn || !currentCalculator) return;
+
+    const active = isFavorite(currentCalculator.id);
+    btn.textContent = active ? "★ В избранном" : "☆ В избранное";
+    btn.classList.toggle("favorite-btn-active", active);
+}
 
 // ---------- РАСЧЁТ ----------
 
